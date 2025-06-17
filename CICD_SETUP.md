@@ -158,7 +158,7 @@ az container create \
 
 4. **Container Startup Issues**:
    - Check container logs: `az container logs --resource-group content-analysis-rg --name content-analysis-api`
-   - Verify the Docker image works locally: `docker run -p 8000:8000 nyuydinebill/content-analysis-fastapi:latest`
+   - Verify the Docker image works locally: `docker run -p 8000:8000 YOUR_USERNAME/content-analysis-fastapi:latest`
 
 ### Debug Commands
 
@@ -203,7 +203,7 @@ az container restart --resource-group content-analysis-rg --name content-analysi
 az container create \
     --resource-group content-analysis-rg \
     --name content-analysis-api \
-    --image nyuydinebill/content-analysis-fastapi:latest \
+    --image YOUR_USERNAME/content-analysis-fastapi:latest \
     --log-analytics-workspace /subscriptions/{subscription-id}/resourceGroups/{resource-group}/providers/Microsoft.OperationalInsights/workspaces/{workspace-name}
 ```
 
@@ -226,5 +226,5 @@ az group delete --name content-analysis-rg --yes --no-wait
 
 ### Remove Docker Images (local)
 ```bash
-docker rmi nyuydinebill/content-analysis-fastapi:latest
+docker rmi YOUR_USERNAME/content-analysis-fastapi:latest
 ```
