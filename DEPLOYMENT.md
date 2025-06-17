@@ -36,10 +36,10 @@ Edit `.github/workflows/docker-build-push.yml` and update the `DOCKER_HUB_REPOSI
 
 ```yaml
 env:
-  DOCKER_HUB_REPOSITORY: your-dockerhub-username/content-analysis-fastapi
+  DOCKER_HUB_REPOSITORY: nyuydinebill/content-analysis-fastapi
 ```
 
-Replace `your-dockerhub-username` with your actual Docker Hub username.
+This is already configured for your Docker Hub username (`nyuydinebill`).
 
 ### Step 3: Push to GitHub
 
@@ -77,7 +77,7 @@ If you prefer manual control:
 az container create \
     --resource-group content-analysis-rg \
     --name content-analysis-api \
-    --image your-dockerhub-username/content-analysis-fastapi:latest \
+    --image nyuydinebill/content-analysis-fastapi:latest \
     --dns-name-label content-analysis-api-$(date +%s) \
     --ports 8000 \
     --cpu 2 \

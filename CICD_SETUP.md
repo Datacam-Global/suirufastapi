@@ -64,7 +64,7 @@ This guide will help you set up automated Docker builds and Azure deployments us
    Edit `.github/workflows/docker-build-push.yml`:
    ```yaml
    env:
-     DOCKER_HUB_REPOSITORY: YOUR_USERNAME/content-analysis-fastapi
+     DOCKER_HUB_REPOSITORY: nyuydinebill/content-analysis-fastapi
    ```
 
 ### Step 3: Update Deployment Script
@@ -75,7 +75,7 @@ DOCKER_HUB_IMAGE="your-dockerhub-username/content-analysis-fastapi"
 ```
 to:
 ```bash
-DOCKER_HUB_IMAGE="YOUR_USERNAME/content-analysis-fastapi"
+DOCKER_HUB_IMAGE="nyuydinebill/content-analysis-fastapi"
 ```
 
 ### Step 4: Test the Pipeline
@@ -133,7 +133,7 @@ az login
 az container create \
     --resource-group content-analysis-rg \
     --name content-analysis-api \
-    --image YOUR_USERNAME/content-analysis-fastapi:latest \
+    --image nyuydinebill/content-analysis-fastapi:latest \
     --dns-name-label content-analysis-api-$(date +%s) \
     --ports 8000 \
     --cpu 2 \
@@ -158,7 +158,7 @@ az container create \
 
 4. **Container Startup Issues**:
    - Check container logs: `az container logs --resource-group content-analysis-rg --name content-analysis-api`
-   - Verify the Docker image works locally: `docker run -p 8000:8000 YOUR_USERNAME/content-analysis-fastapi:latest`
+   - Verify the Docker image works locally: `docker run -p 8000:8000 nyuydinebill/content-analysis-fastapi:latest`
 
 ### Debug Commands
 
@@ -167,8 +167,8 @@ az container create \
 # Go to: Repository → Actions → Select workflow run → View logs
 
 # Test Docker image locally
-docker pull YOUR_USERNAME/content-analysis-fastapi:latest
-docker run -p 8000:8000 YOUR_USERNAME/content-analysis-fastapi:latest
+docker pull nyuydinebill/content-analysis-fastapi:latest
+docker run -p 8000:8000 nyuydinebill/content-analysis-fastapi:latest
 
 # Check Azure container status
 az container show --resource-group content-analysis-rg --name content-analysis-api
@@ -203,7 +203,7 @@ az container restart --resource-group content-analysis-rg --name content-analysi
 az container create \
     --resource-group content-analysis-rg \
     --name content-analysis-api \
-    --image YOUR_USERNAME/content-analysis-fastapi:latest \
+    --image nyuydinebill/content-analysis-fastapi:latest \
     --log-analytics-workspace /subscriptions/{subscription-id}/resourceGroups/{resource-group}/providers/Microsoft.OperationalInsights/workspaces/{workspace-name}
 ```
 
@@ -226,5 +226,5 @@ az group delete --name content-analysis-rg --yes --no-wait
 
 ### Remove Docker Images (local)
 ```bash
-docker rmi YOUR_USERNAME/content-analysis-fastapi:latest
+docker rmi nyuydinebill/content-analysis-fastapi:latest
 ```

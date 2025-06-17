@@ -7,7 +7,7 @@ on:
     branches: [ main, master ]
 
 env:
-  DOCKER_HUB_REPOSITORY: your-dockerhub-username/content-analysis-fastapi
+  DOCKER_HUB_REPOSITORY: nyuydinebill/content-analysis-fastapi
 
 jobs:
   build-and-push:
