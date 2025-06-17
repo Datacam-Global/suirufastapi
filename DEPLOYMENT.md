@@ -15,7 +15,7 @@ This guide will help you deploy your FastAPI Content Analysis application to Azu
 
 2. **Docker Hub Account**: Create an account at [hub.docker.com](https://hub.docker.com)
 
-3. **GitHub Repository**: Your code should be in a GitHub repository
+3. **GitHub Repositoryy**: Your code should be in a GitHub repository
 
 4. **Docker Hub Access Token**: Create a personal access token in Docker Hub
    - Go to Account Settings → Security → New Access Token
