@@ -20,9 +20,14 @@ app = FastAPI(
 # Add CORS middleware to allow requests from Django backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure this to your Django app's URL in production
+    allow_origins=[
+        "https://server.sui-ru.com",
+        "http://server.sui-ru.com", 
+        "http://localhost:8000",  # For local Django development
+        "http://127.0.0.1:8000",  # For local Django development
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 
