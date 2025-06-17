@@ -40,3 +40,22 @@ echo "4. Test the health endpoint: /health"
 echo ""
 echo "🔧 Deployment command (copy and run):"
 echo "az webapp deploy --resource-group sui-ru --name fastapis --src-path deployment.zip --type zip"
+
+# Exit on any error
+set -e
+
+echo "Starting deployment..."
+
+# Create virtual environment
+python3.12 -m venv antenv
+
+# Activate virtual environment
+source antenv/bin/activate
+
+# Upgrade pip
+python -m pip install --upgrade pip
+
+# Install dependencies with verbose output and timeout
+pip install -r requirements.txt --timeout=300 --verbose
+
+echo "Deployment completed successfully"
