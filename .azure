@@ -1,0 +1,9 @@
+# Build configuration for Azure App Service
+[build-env]
+PRE_BUILD_COMMAND="echo 'Starting pre-build setup'"
+POST_BUILD_COMMAND="echo 'Build completed successfully'"
+
+[python-env]
+PYTHON_VERSION="3.12"
+ENABLE_COLLECTSTATIC=0
+DISABLE_COLLECTSTATIC=1

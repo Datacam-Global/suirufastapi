@@ -1,0 +1,18 @@
+# Essential FastAPI dependencies
+fastapi==0.115.12
+uvicorn[standard]==0.34.3
+python-multipart==0.0.20
+
+# Core ML and data processing
+pandas==2.2.3
+numpy==2.2.6
+scikit-learn==1.6.1
+joblib==1.5.1
+
+# NLP
+nltk==3.9.1
+
+# Additional required dependencies
+pydantic==2.11.5
+starlette==0.46.2
+typing_extensions==4.14.0

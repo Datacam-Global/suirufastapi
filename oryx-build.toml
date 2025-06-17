@@ -1,0 +1,9 @@
+[build-env]
+PRE_BUILD_COMMAND="echo 'Starting pre-build' && pip install --upgrade pip"
+PRE_BUILD_SCRIPT_PATH="startup.sh" 
+POST_BUILD_COMMAND="echo 'Build completed successfully'"
+
+[python-env]
+PYTHON_VERSION="3.12"
+ENABLE_COLLECTSTATIC=0
+DISABLE_COLLECTSTATIC=1

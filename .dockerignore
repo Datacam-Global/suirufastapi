@@ -35,7 +35,14 @@ README*
 .DS_Store
 Thumbs.db
 
-# Misc
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Local development
 .dockerignore
-Dockerfile
 docker-compose*.yml
+
+# Azure deployment files
+azure-deploy.json
