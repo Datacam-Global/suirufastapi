@@ -2,6 +2,9 @@ import joblib
 import os
 from typing import Tuple, Dict, Any
 from abc import ABC, abstractmethod
+import requests
+import openai
+import sys
 
 class BaseContentAnalyzer(ABC):
     """Base class for content analyzers"""
@@ -62,47 +65,63 @@ class HateSpeechAnalyzer(BaseContentAnalyzer):
         }
 
 class MisinformationAnalyzer(BaseContentAnalyzer):
-    """Misinformation detection analyzer"""
+    """Misinformation detection analyzer with Azure OpenAI support"""
     
-    def __init__(self):
-        # For now, this is a placeholder implementation
-        # You can later add actual misinformation detection models
-        pass
-    
+    def __init__(self, api_key: str = None):
+        # Use API key from env if not provided
+        self.api_key = api_key or os.getenv("AZURE_OPENAI_API_KEY")
+
     def predict(self, text: str) -> Tuple[str, float, str]:
-        """Predict misinformation in text"""
-        # Placeholder implementation - replace with actual model
-        # This is a simple keyword-based approach for demonstration
-        
-        misinformation_keywords = [
-            'fake news', 'conspiracy', 'hoax', 'false claim', 
-            'debunked', 'unverified', 'misleading'
-        ]
-        
-        text_lower = text.lower()
-        keyword_count = sum(1 for keyword in misinformation_keywords if keyword in text_lower)
-        
-        # Simple probability based on keyword presence
-        proba = min(keyword_count * 0.3, 0.9)
-        
-        if proba >= 0.6:
-            prediction = "misinformation"
-            confidence = "medium"
-        elif proba >= 0.3:
-            prediction = "likely_misinformation"
-            confidence = "low"
-        else:
-            prediction = "no_misinformation"
-            confidence = "low"  # Low confidence due to simple implementation
-        
-        return prediction, proba, confidence
-    
+        # Print env config for debugging
+        print(f"[Azure OpenAI Config] API_KEY={os.getenv('AZURE_OPENAI_API_KEY')}", file=sys.stderr)
+        print(f"[Azure OpenAI Config] ENDPOINT={os.getenv('AZURE_OPENAI_ENDPOINT')}", file=sys.stderr)
+        print(f"[Azure OpenAI Config] DEPLOYMENT={os.getenv('AZURE_OPENAI_DEPLOYMENT')}", file=sys.stderr)
+        print(f"[Azure OpenAI Config] API_VERSION={os.getenv('AZURE_OPENAI_API_VERSION')}", file=sys.stderr)
+        # Use only Azure OpenAI for misinformation detection
+        azure_api_key = os.getenv("AZURE_OPENAI_API_KEY")
+        azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+        azure_deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+        azure_api_version = os.getenv("AZURE_OPENAI_API_VERSION")
+        if azure_api_key and azure_endpoint and azure_deployment and azure_api_version:
+            try:
+                headers = {
+                    "api-key": azure_api_key,
+                    "Content-Type": "application/json"
+                }
+                data = {
+                    "messages": [
+                        {"role": "system", "content": "You are a fact-checking assistant."},
+                        {"role": "user", "content": f"Fact check the following claim. Claim: {text} Is the claim true, false, or unverifiable? Respond with one word: true, false, or unverifiable."}
+                    ],
+                    "max_tokens": 5,
+                    "temperature": 0
+                }
+                url = f"{azure_endpoint}openai/deployments/{azure_deployment}/chat/completions?api-version={azure_api_version}"
+                response = requests.post(url, headers=headers, json=data, timeout=20)
+                print(f"[Azure OpenAI Request] url={url} data={data}", file=sys.stderr)
+                print(f"[Azure OpenAI Response] status={response.status_code} body={response.text}", file=sys.stderr)
+                if response.status_code == 200:
+                    result = response.json()
+                    answer = result["choices"][0]["message"]["content"].strip().lower()
+                    if answer == "false":
+                        return "misinformation", 0.7, "medium"
+                    elif answer == "unverifiable":
+                        return "unverified", 0.0, "unknown"
+                    else:
+                        return "no_misinformation", 0.0, "low"
+            except Exception as e:
+                print(f"[Azure OpenAI Exception] {e}", file=sys.stderr)
+                return "unverified", 0.0, "unknown"
+        # If Azure OpenAI config is missing or fails
+        print("[Azure OpenAI] Missing configuration or failed to execute.", file=sys.stderr)
+        return "unverified", 0.0, "unknown"
+
     def get_details(self) -> Dict[str, Any]:
         """Get misinformation analysis details"""
         return {
             "model_type": "misinformation_classifier",
-            "features_used": "keyword_detection",
-            "note": "Placeholder implementation - replace with actual ML model",
+            "features_used": "azure_openai",
+            "note": "Uses Azure OpenAI for misinformation detection",
             "threshold_info": {
                 "misinformation": ">= 0.6",
                 "likely_misinformation": "0.3-0.6",
@@ -122,5 +141,6 @@ class ContentAnalyzerFactory:
     
     @staticmethod
     def create_misinformation_analyzer() -> MisinformationAnalyzer:
-        """Create misinformation analyzer"""
-        return MisinformationAnalyzer()
+        """Create misinformation analyzer with Azure OpenAI support"""
+        api_key = os.getenv("AZURE_OPENAI_API_KEY")
+        return MisinformationAnalyzer(api_key=api_key)
