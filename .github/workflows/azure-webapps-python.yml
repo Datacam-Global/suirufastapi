@@ -60,6 +60,12 @@ jobs:
           source venv/bin/activate
           python -c "import uvicorn; print('uvicorn version:', uvicorn.__version__)"
           pip list | grep uvicorn
+          
+      - name: Clean up for deployment
+        run: |
+          find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+          find . -name "*.pyc" -delete 2>/dev/null || true
+          rm -rf .pytest_cache .coverage 2>/dev/null || true
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
@@ -68,12 +74,15 @@ jobs:
         with:
           name: python-app
           path: |
-            . 
-            !venv/bin/
-            !venv/include/
-            !venv/share/
-            !venv/pyvenv.cfg
-            !venv/lib64
+            app/
+            models/
+            routers/
+            schemas/
+            requirements.txt
+            runtime.txt
+            startup.sh
+            *.py
+            *.joblib
 
   deploy:
     permissions:
@@ -90,16 +99,6 @@ jobs:
         with:
           name: python-app
           path: .
-          
-      - name: Set up Python version
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
           
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
