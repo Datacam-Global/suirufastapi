@@ -1,6 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from datetime import datetime
+from typing import Dict, Any
 from app.models.misinformation import MisinformationAnalyzer
 
 router = APIRouter()
@@ -20,10 +21,14 @@ misinfo_analyzer = MisinformationAnalyzer()
 
 @router.post("/analyze/", response_model=MisinformationResponse)
 @router.post("/analyze", response_model=MisinformationResponse)
-async def analyze_misinformation(request: MisinformationRequest):
-    label, confidence, severity = misinfo_analyzer.predict(request.text)
+async def analyze_misinformation(request: Dict[str, Any]):
+    text = request.get("text")
+    if not text or not isinstance(text, str):
+        raise HTTPException(status_code=422, detail="A 'text' field of type string is required.")
+        
+    label, confidence, severity = misinfo_analyzer.predict(text)
     return MisinformationResponse(
-        text=request.text,
+        text=text,
         label=label,
         confidence=confidence,
         severity=severity,

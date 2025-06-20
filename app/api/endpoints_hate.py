@@ -90,26 +90,35 @@ def convert_result_to_response(result: HateSpeechResult, processing_time: float)
 @router.post("/analyze/", response_model=HateSpeechResponse)
 @router.post("/analyze", response_model=HateSpeechResponse)
 async def analyze_text(
-        request: TextAnalysisRequest,
+        request: Dict[str, Any],
         background_tasks: BackgroundTasks,
         detector: CameroonHateSpeechDetector = Depends(get_detector),
         db: DatabaseManager = Depends(get_db_manager)
 ):
     try:
         start_time = datetime.now()
-        result = detector.detect_hate_speech(request.text)
+        text = request.get("text")
+        if not text or not isinstance(text, str):
+            raise HTTPException(status_code=422, detail="A 'text' field of type string is required.")
+            
+        result = detector.detect_hate_speech(text)
         processing_time = (datetime.now() - start_time).total_seconds() * 1000
-        if request.store_result:
+        
+        if request.get("store_result", True):
             metadata = {
-                'user_id': request.user_id,
-                'platform': request.platform,
+                'user_id': request.get("user_id"),
+                'platform': request.get("platform"),
                 'post_id': None,
                 'api_endpoint': '/analyze'
             }
             background_tasks.add_task(db.store_detection, result, metadata)
+            
         response = convert_result_to_response(result, processing_time)
         return response
     except Exception as e:
+        # Re-raise HTTPException to avoid shadowing 422 errors
+        if isinstance(e, HTTPException):
+            raise e
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
 
 @router.post("/analyze/batch/", response_model=BatchAnalysisResponse)
