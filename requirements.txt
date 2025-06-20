@@ -1,6 +1,6 @@
 # Cleaned requirements.txt for FastAPI Hate Speech Project
 fastapi>=0.104.0
-uvicorn[standard]>=0.24.0
+uvicorn
 python-multipart>=0.0.6
 pydantic>=2.5.0
 torch>=1.9.0
