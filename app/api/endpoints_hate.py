@@ -97,18 +97,29 @@ async def analyze_text(
 ):
     try:
         start_time = datetime.now()
-        text = request.get("text")
-        if not text or not isinstance(text, str):
-            raise HTTPException(status_code=422, detail="A 'text' field of type string is required.")
+        text_data = request.get("text")
+
+        if isinstance(text_data, dict):
+            text_to_analyze = text_data.get("text")
+            post_id = text_data.get("id")
+        elif isinstance(text_data, str):
+            # Keep backward compatibility for string-only text
+            text_to_analyze = text_data
+            post_id = None
+        else:
+            raise HTTPException(status_code=422, detail="The 'text' field must be a string or an object containing a 'text' string.")
+
+        if not text_to_analyze:
+            raise HTTPException(status_code=422, detail="No text to analyze.")
             
-        result = detector.detect_hate_speech(text)
+        result = detector.detect_hate_speech(text_to_analyze)
         processing_time = (datetime.now() - start_time).total_seconds() * 1000
         
         if request.get("store_result", True):
             metadata = {
                 'user_id': request.get("user_id"),
                 'platform': request.get("platform"),
-                'post_id': None,
+                'post_id': post_id,
                 'api_endpoint': '/analyze'
             }
             background_tasks.add_task(db.store_detection, result, metadata)
