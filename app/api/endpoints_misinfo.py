@@ -18,6 +18,7 @@ class MisinformationResponse(BaseModel):
 
 misinfo_analyzer = MisinformationAnalyzer()
 
+@router.post("/analyze/", response_model=MisinformationResponse)
 @router.post("/analyze", response_model=MisinformationResponse)
 async def analyze_misinformation(request: MisinformationRequest):
     label, confidence, severity = misinfo_analyzer.predict(request.text)

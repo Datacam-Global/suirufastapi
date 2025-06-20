@@ -87,6 +87,7 @@ def convert_result_to_response(result: HateSpeechResult, processing_time: float)
 # API ENDPOINTS
 # ================================
 
+@router.post("/analyze/", response_model=HateSpeechResponse)
 @router.post("/analyze", response_model=HateSpeechResponse)
 async def analyze_text(
         request: TextAnalysisRequest,
@@ -111,6 +112,7 @@ async def analyze_text(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
 
+@router.post("/analyze/batch/", response_model=BatchAnalysisResponse)
 @router.post("/analyze/batch", response_model=BatchAnalysisResponse)
 async def analyze_batch(
         request: BatchAnalysisRequest,
