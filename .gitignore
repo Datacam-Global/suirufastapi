@@ -1,3 +1,10 @@
-venv
-env
+__pycache__/
+*.py[cod]
+venv/
 .env
+*.log
+*.sqlite3
+staticfiles/
+.DS_Store
+.vscode/
+.idea/
