@@ -21,25 +21,21 @@ misinfo_analyzer = MisinformationAnalyzer()
 
 @router.post("/analyze/", response_model=MisinformationResponse)
 @router.post("/analyze", response_model=MisinformationResponse)
-async def analyze_misinformation(request: Dict[str, Any]):
-    text_data = request.get("text")
-    
-    if isinstance(text_data, dict):
-        text_to_analyze = text_data.get("text")
-    elif isinstance(text_data, str):
-        text_to_analyze = text_data
-    else:
-        raise HTTPException(status_code=422, detail="The 'text' field must be a string or an object containing a 'text' string.")
-
-    if not text_to_analyze:
-        raise HTTPException(status_code=422, detail="No text to analyze.")
+async def analyze_misinformation(request: MisinformationRequest):
+    try:
+        # Extract text from the request
+        text_to_analyze = request.text
         
-    label, confidence, severity = misinfo_analyzer.predict(text_to_analyze)
-    return MisinformationResponse(
-        text=text_to_analyze,
-        label=label,
-        confidence=confidence,
-        severity=severity,
-        timestamp=datetime.now(),
-        explanation=f"Detected as {label} (confidence: {confidence}, severity: {severity})"
-    )
+        # Call OpenAI for misinformation detection
+        label, confidence, severity = misinfo_analyzer.predict(text_to_analyze)
+        
+        return MisinformationResponse(
+            text=text_to_analyze,
+            label=label,
+            confidence=confidence,
+            severity=severity,
+            timestamp=datetime.now(),
+            explanation=f"OpenAI analysis: {label} (confidence: {confidence}, severity: {severity})"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error analyzing misinformation: {str(e)}")

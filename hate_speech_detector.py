@@ -866,23 +866,21 @@ class SocialMediaProcessor:
         return hate_speech_results
 
 class MisinformationAnalyzer:
-    """Misinformation detection analyzer with Azure OpenAI support"""
+    """Misinformation detection analyzer with OpenAI support"""
     def __init__(self, api_key: str = None):
-        self.api_key = api_key or os.getenv("AZURE_OPENAI_API_KEY")
+        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
 
     def predict(self, text: str) -> Tuple[str, float, str]:
     
-        azure_api_key = os.getenv("AZURE_OPENAI_API_KEY")
-        azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
-        azure_deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT")
-        azure_api_version = os.getenv("AZURE_OPENAI_API_VERSION")
-        if azure_api_key and azure_endpoint and azure_deployment and azure_api_version:
+        openai_api_key = os.getenv("OPENAI_API_KEY")
+        if openai_api_key:
             try:
                 headers = {
-                    "api-key": azure_api_key,
+                    "Authorization": f"Bearer {openai_api_key}",
                     "Content-Type": "application/json"
                 }
                 data = {
+                    "model": "gpt-3.5-turbo",
                     "messages": [
                         {"role": "system", "content": "You are a fact-checking assistant."},
                         {"role": "user", "content": f"Fact check the following claim. Claim: {text} Is the claim true, false, or unverifiable? Respond with one word: true, false, or unverifiable."}
@@ -890,10 +888,10 @@ class MisinformationAnalyzer:
                     "max_tokens": 5,
                     "temperature": 0
                 }
-                url = f"{azure_endpoint}openai/deployments/{azure_deployment}/chat/completions?api-version={azure_api_version}"
+                url = "https://api.openai.com/v1/chat/completions"
                 response = requests.post(url, headers=headers, json=data, timeout=20)
-                print(f"[Azure OpenAI Request] url={url} data={data}", file=sys.stderr)
-                print(f"[Azure OpenAI Response] status={response.status_code} body={response.text}", file=sys.stderr)
+                print(f"[OpenAI Request] url={url} data={data}", file=sys.stderr)
+                print(f"[OpenAI Response] status={response.status_code} body={response.text}", file=sys.stderr)
                 if response.status_code == 200:
                     result = response.json()
                     answer = result["choices"][0]["message"]["content"].strip().lower()
@@ -904,16 +902,16 @@ class MisinformationAnalyzer:
                     else:
                         return "no_misinformation", 0.0, "low"
             except Exception as e:
-                print(f"[Azure OpenAI Exception] {e}", file=sys.stderr)
+                print(f"[OpenAI Exception] {e}", file=sys.stderr)
                 return "unverified", 0.0, "unknown"
-        print("[Azure OpenAI] Missing configuration or failed to execute.", file=sys.stderr)
+        print("[OpenAI] Missing configuration or failed to execute.", file=sys.stderr)
         return "unverified", 0.0, "unknown"
 
     def get_details(self) -> dict:
         return {
             "model_type": "misinformation_classifier",
-            "features_used": "azure_openai",
-            "note": "Uses Azure OpenAI for misinformation detection",
+            "features_used": "openai",
+            "note": "Uses OpenAI for misinformation detection",
             "threshold_info": {
                 "misinformation": ">= 0.6",
                 "likely_misinformation": "0.3-0.6",

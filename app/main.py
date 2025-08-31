@@ -14,11 +14,8 @@ load_dotenv()
 
 app = FastAPI()
 
-# Debug prints for Azure OpenAI environment variables
-print("[DEBUG] AZURE_OPENAI_API_KEY:", os.getenv("AZURE_OPENAI_API_KEY"))
-print("[DEBUG] AZURE_OPENAI_ENDPOINT:", os.getenv("AZURE_OPENAI_ENDPOINT"))
-print("[DEBUG] AZURE_OPENAI_DEPLOYMENT:", os.getenv("AZURE_OPENAI_DEPLOYMENT"))
-print("[DEBUG] AZURE_OPENAI_API_VERSION:", os.getenv("AZURE_OPENAI_API_VERSION"))
+# Debug prints for OpenAI environment variables
+print("[DEBUG] OPENAI_API_KEY:", os.getenv("OPENAI_API_KEY"))
 
 # Use prefixes so both sets of endpoints are visible and do not conflict
 app.include_router(endpoints_hate.router, prefix="/hate", tags=["Hate Speech"])
